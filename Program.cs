@@ -12,42 +12,57 @@ namespace Reserva_de_Espacios_Biblioteca
 {
     internal static class Program
     {
+        // Guardamos el host en una variable estática para poder exponer su IServiceProvider
+        private static IHost _host;
+
         [STAThread]
         static void Main()
         {
-            var host = Host.CreateDefaultBuilder()
+            _host = Host.CreateDefaultBuilder()
                 .ConfigureServices((_, services) =>
                 {
-                    // 1) DbContext transient: nueva instancia en cada inyección
+                    // 1) DbContext: alcance "scoped"
                     services.AddDbContext<AppDbContext>(opts =>
                         opts.UseSqlServer(
-                          @"Server=(localdb)\MSSQLLocalDB;Database=CabinasDb;Trusted_Connection=True;",
-                          sqlOpts => { /* opcional: timeouts, etc. */ }
+                            @"Server=(localdb)\MSSQLLocalDB;Database=CabinasDb;Trusted_Connection=True;"
                         ),
-                        contextLifetime: ServiceLifetime.Transient
+                        contextLifetime: ServiceLifetime.Scoped
                     );
 
-
-                    // 2) Registrar Services y ViewModels (todos transient)
-                    services.AddTransient<ReservaUiService>();
-                    services.AddTransient<MainViewModel>();
+                    // 2) Servicios / ViewModels
+                    services.AddTransient<ReservaUIService>();
                     services.AddTransient<ReservaViewModel>();
+                    services.AddTransient<UsuarioViewModel>();
 
                     // 3) Formularios
                     services.AddTransient<MainForm>();
                     services.AddTransient<ReservaForm>();
                     services.AddTransient<NuevaReservaForm>();
+                    services.AddTransient<NuevoUsuarioForm>();
+                    services.AddTransient<MenuUsuariosForm>();
+                    services.AddTransient<MenuReservasForm>();
                 })
                 .Build();
-
 
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Resolvemos MainForm e iniciamos la aplicación
-            var mainForm = host.Services.GetRequiredService<MainForm>();
-            Application.Run(mainForm);
+            // Creamos un scope para resolver MainForm y ejecutarla
+            using (var scope = _host.Services.CreateScope())
+            {
+                var mainForm = scope.ServiceProvider.GetRequiredService<MainForm>();
+                Application.Run(mainForm);
+            }
+        }
+
+        /// <summary>
+        /// Permite acceder al IServiceProvider global (root) para resolver servicios/formularios
+        /// desde cualquier parte de la aplicación.
+        /// </summary>
+        public static IServiceProvider GetServiceProvider()
+        {
+            return _host.Services;
         }
     }
 }

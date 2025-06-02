@@ -1,18 +1,25 @@
-﻿using Reserva_de_Espacios_Biblioteca.Data.Entities;
-
-namespace Reserva_de_Espacios_Biblioteca.Views
+﻿namespace Reserva_de_Espacios_Biblioteca.Views
 {
     partial class NuevaReservaForm
     {
         /// <summary>
-        /// Required designer variable.
+        /// Variable del diseñador requerida.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+        internal System.Windows.Forms.DateTimePicker dtpInicio;
+        internal System.Windows.Forms.DateTimePicker dtpFin;
+        internal System.Windows.Forms.TextBox txtDni;
+        internal System.Windows.Forms.Button btnBuscarUsuario;
+        internal System.Windows.Forms.Button btnAceptar;
+        internal System.Windows.Forms.Button btnCancelar;
+        private System.Windows.Forms.Label labelBuscar;
+        private System.Windows.Forms.Label labelInicio;
+        private System.Windows.Forms.Label labelFin;
+
         /// <summary>
-        /// Clean up any resources being used.
+        /// Limpiar los recursos que se estén utilizando.
         /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,121 +29,127 @@ namespace Reserva_de_Espacios_Biblioteca.Views
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+        #region Código generado por el Diseñador de Windows Forms
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            cbCabinas = new ComboBox();
-            dtpInicio = new DateTimePicker();
-            dtpFin = new DateTimePicker();
-            contextMenuStrip1 = new ContextMenuStrip(components);
-            txtDni = new TextBox();
-            btnAceptar = new Button();
-            btnCancelar = new Button();
+            dtpInicio = new System.Windows.Forms.DateTimePicker();
+            dtpFin = new System.Windows.Forms.DateTimePicker();
+            txtDni = new System.Windows.Forms.TextBox();
+            btnBuscarUsuario = new System.Windows.Forms.Button();
+            btnAceptar = new System.Windows.Forms.Button();
+            btnCancelar = new System.Windows.Forms.Button();
+            labelBuscar = new System.Windows.Forms.Label();
+            labelInicio = new System.Windows.Forms.Label();
+            labelFin = new System.Windows.Forms.Label();
             SuspendLayout();
             // 
-            // cbCabinas
+            // labelBuscar
             // 
-            cbCabinas.Dock = DockStyle.Top;
-            cbCabinas.FormattingEnabled = true;
-            cbCabinas.Location = new Point(0, 0);
-            cbCabinas.Name = "cbCabinas";
-            cbCabinas.Size = new Size(800, 23);
-            cbCabinas.TabIndex = 0;
-            // 
-            // dtpInicio
-            // 
-            dtpInicio.CustomFormat = "dd/MM/yyyy - HH:mm";
-            dtpInicio.Dock = DockStyle.Top;
-            dtpInicio.Format = DateTimePickerFormat.Custom;
-            dtpInicio.Location = new Point(0, 23);
-            dtpInicio.Name = "dtpInicio";
-            dtpInicio.Size = new Size(800, 23);
-            dtpInicio.TabIndex = 1;
-            // 
-            // dtpFin
-            // 
-            dtpFin.CustomFormat = "dd/MM/yyyy - HH:mm";
-            dtpFin.Dock = DockStyle.Top;
-            dtpFin.Format = DateTimePickerFormat.Custom;
-            dtpFin.Location = new Point(0, 46);
-            dtpFin.Name = "dtpFin";
-            dtpFin.Size = new Size(800, 23);
-            dtpFin.TabIndex = 2;
-            // 
-            // contextMenuStrip1
-            // 
-            contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(61, 4);
+            labelBuscar.AutoSize = true;
+            labelBuscar.Location = new System.Drawing.Point(12, 30);
+            labelBuscar.Name = "labelBuscar";
+            labelBuscar.Size = new System.Drawing.Size(236, 15);
+            labelBuscar.TabIndex = 0;
+            labelBuscar.Text = "Buscar usuario (Nombre/Apellidos o DNI):";
             // 
             // txtDni
             // 
-            txtDni.Dock = DockStyle.Top;
-            txtDni.Location = new Point(0, 69);
+            txtDni.Location = new System.Drawing.Point(12, 49);
             txtDni.Name = "txtDni";
-            txtDni.Size = new Size(800, 23);
-            txtDni.TabIndex = 4;
-            txtDni.Text = "Introduce un DNI";
+            txtDni.Size = new System.Drawing.Size(308, 23);
+            txtDni.TabIndex = 1;
+            // 
+            // btnBuscarUsuario
+            // 
+            btnBuscarUsuario.Location = new System.Drawing.Point(326, 48);
+            btnBuscarUsuario.Name = "btnBuscarUsuario";
+            btnBuscarUsuario.Size = new System.Drawing.Size(171, 25);
+            btnBuscarUsuario.TabIndex = 2;
+            btnBuscarUsuario.Text = "Buscar";
+            btnBuscarUsuario.UseVisualStyleBackColor = true;
+            // 
+            // labelInicio
+            // 
+            labelInicio.AutoSize = true;
+            labelInicio.Location = new System.Drawing.Point(12, 91);
+            labelInicio.Name = "labelInicio";
+            labelInicio.Size = new System.Drawing.Size(131, 15);
+            labelInicio.TabIndex = 3;
+            labelInicio.Text = "Hora comienzo reserva:";
+            // 
+            // dtpInicio
+            // 
+            dtpInicio.CustomFormat = "dd/MM/yyyy HH:mm";
+            dtpInicio.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            dtpInicio.Location = new System.Drawing.Point(12, 109);
+            dtpInicio.Name = "dtpInicio";
+            dtpInicio.ShowUpDown = true;
+            dtpInicio.Size = new System.Drawing.Size(485, 23);
+            dtpInicio.TabIndex = 4;
+            // 
+            // labelFin
+            // 
+            labelFin.AutoSize = true;
+            labelFin.Location = new System.Drawing.Point(12, 157);
+            labelFin.Name = "labelFin";
+            labelFin.Size = new System.Drawing.Size(109, 15);
+            labelFin.TabIndex = 5;
+            labelFin.Text = "Hora fin de reserva:";
+            // 
+            // dtpFin
+            // 
+            dtpFin.CustomFormat = "dd/MM/yyyy HH:mm";
+            dtpFin.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            dtpFin.Location = new System.Drawing.Point(12, 175);
+            dtpFin.Name = "dtpFin";
+            dtpFin.ShowUpDown = true;
+            dtpFin.Size = new System.Drawing.Size(485, 23);
+            dtpFin.TabIndex = 6;
             // 
             // btnAceptar
             // 
-            btnAceptar.Dock = DockStyle.Top;
-            btnAceptar.Location = new Point(0, 92);
+            btnAceptar.Location = new System.Drawing.Point(118, 216);
             btnAceptar.Name = "btnAceptar";
-            btnAceptar.Size = new Size(800, 23);
-            btnAceptar.TabIndex = 5;
+            btnAceptar.Size = new System.Drawing.Size(300, 30);
+            btnAceptar.TabIndex = 7;
             btnAceptar.Text = "Aceptar";
             btnAceptar.UseVisualStyleBackColor = true;
-            btnAceptar.Click += async (_, __) =>
-            {
-                var r = new Reserva { /* … */ };
-                await _vm.CreateReservaAsync(r);
-                DialogResult = DialogResult.OK;
-                Close();
-            };
-
             // 
             // btnCancelar
             // 
-            btnCancelar.DialogResult = DialogResult.Cancel;
-            btnCancelar.Dock = DockStyle.Top;
-            btnCancelar.Location = new Point(0, 115);
+            btnCancelar.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            btnCancelar.Location = new System.Drawing.Point(118, 254);
             btnCancelar.Name = "btnCancelar";
-            btnCancelar.Size = new Size(800, 23);
-            btnCancelar.TabIndex = 6;
+            btnCancelar.Size = new System.Drawing.Size(300, 30);
+            btnCancelar.TabIndex = 8;
             btnCancelar.Text = "Cancelar";
             btnCancelar.UseVisualStyleBackColor = true;
             // 
             // NuevaReservaForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(522, 303);
             Controls.Add(btnCancelar);
             Controls.Add(btnAceptar);
-            Controls.Add(txtDni);
             Controls.Add(dtpFin);
+            Controls.Add(labelFin);
             Controls.Add(dtpInicio);
-            Controls.Add(cbCabinas);
+            Controls.Add(labelInicio);
+            Controls.Add(btnBuscarUsuario);
+            Controls.Add(txtDni);
+            Controls.Add(labelBuscar);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "NuevaReservaForm";
-            Text = "Nueva Reserva";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            Text = "Reserva Cabina Insonorizada";
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
-
-        private ComboBox cbCabinas;
-        private DateTimePicker dtpInicio;
-        private DateTimePicker dtpFin;
-        private ContextMenuStrip contextMenuStrip1;
-        private TextBox txtDni;
-        private Button btnAceptar;
-        private Button btnCancelar;
     }
 }

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Reserva_de_Espacios_Biblioteca": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

@@ -8,23 +8,17 @@ using Reserva_de_Espacios_Biblioteca.ViewModels;
 
 namespace Reserva_de_Espacios_Biblioteca.Views
 {
-    public partial class NuevaReservaForm : Form
+    public partial class EditarReservaForm : Form
     {
-        // — Flujos de datos que recibe el formulario —
-        public bool IsEditMode { get; set; } = false;
+        // — Propiedades públicas que MainForm configurará antes de ShowDialog() —
         public int EditingReservaId { get; set; } = -1;
-
-        /// <summary>
-        /// Ahora recibimos directamente el ID de la cabina seleccionada.
-        /// </summary>
         public int SelectedCabinaId { get; set; } = 0;
-
         public DateTime SelectedInicio { get; set; }
         public DateTime SelectedFin { get; set; }
 
         /// <summary>
-        /// Propiedad auxiliar para exponer el contenido de txtDni
-        /// (en modo edición, MainForm la asigna con el DNI original).
+        /// Texto auxiliar que expone el contenido de txtDni.
+        /// En el Load precargaremos el DNI del usuario actual.
         /// </summary>
         public string Dni
         {
@@ -35,29 +29,30 @@ namespace Reserva_de_Espacios_Biblioteca.Views
         // Vista‐modelo inyectado
         private readonly ReservaViewModel _vm;
 
-        // Aquí guardaremos el usuario que el operador elige en tiempo de ejecución
+        // Aquí guardaremos el usuario que el operador elige (o que ya venía en la reserva)
         private Usuario _usuarioSeleccionado;
 
-        public NuevaReservaForm(ReservaViewModel vm)
+        public EditarReservaForm(ReservaViewModel vm)
         {
             InitializeComponent();
             _vm = vm;
 
             // 1) Al cargar el formulario, inicializamos los DateTimePickers
-            //    y, si venimos en modo edición, intentamos precargar el usuario
+            //    y precargamos el usuario si Dni ya estaba asignado.
             this.Load += async (_, __) =>
             {
                 dtpInicio.Value = SelectedInicio;
                 dtpFin.Value = SelectedFin;
 
-                if (IsEditMode && !string.IsNullOrWhiteSpace(Dni))
+                if (!string.IsNullOrWhiteSpace(Dni))
                 {
-                    // Precargamos al usuario basándonos en el DNI que vino de MainForm
+                    // Precargamos al usuario según el DNI que vino de MainForm
                     var candidatos = await _vm.BuscarUsuariosAsync(Dni.Trim());
                     var u = candidatos.FirstOrDefault();
                     if (u != null)
                     {
                         _usuarioSeleccionado = u;
+                        // Mostramos “Apellidos, Nombre” en el textbox
                         txtDni.Text = $"{u.Apellidos}, {u.Nombre}";
                     }
                 }
@@ -69,8 +64,7 @@ namespace Reserva_de_Espacios_Biblioteca.Views
                 if (e.KeyCode == Keys.Enter)
                 {
                     e.Handled = true;
-                    e.SuppressKeyPress = true; // evita el 'ding' de Windows
-
+                    e.SuppressKeyPress = true; // evita el 'ding'
                     await EjecutarBusquedaUsuarioAsync();
                 }
             };
@@ -81,10 +75,10 @@ namespace Reserva_de_Espacios_Biblioteca.Views
                 await EjecutarBusquedaUsuarioAsync();
             };
 
-            // 4) Botón “Aceptar”: crear o actualizar la reserva
+            // 4) Botón “Aceptar”: validar y actualizar la reserva
             btnAceptar.Click += async (_, __) =>
             {
-                // 4.1) Validar que haya un usuario seleccionado
+                // 4.1) Verificar que haya un usuario seleccionado
                 if (_usuarioSeleccionado == null)
                 {
                     MessageBox.Show("Debes buscar y seleccionar primero un usuario válido.",
@@ -94,7 +88,7 @@ namespace Reserva_de_Espacios_Biblioteca.Views
                     return;
                 }
 
-                // 4.2) Validar rangos de fecha/hora
+                // 4.2) Validar rango de fechas
                 if (dtpInicio.Value >= dtpFin.Value)
                 {
                     MessageBox.Show("La fecha/hora de inicio debe ser anterior a la de fin.",
@@ -104,44 +98,18 @@ namespace Reserva_de_Espacios_Biblioteca.Views
                     return;
                 }
 
-                // 4.3) Validar que SelectedCabinaId sea distinto de cero
-                if (SelectedCabinaId == 0)
+                // 4.3) Crear objeto Reserva usando el ID de cabina y usuario
+                var reserva = new Reserva
                 {
-                    MessageBox.Show("No se pudo determinar la cabina seleccionada.",
-                                    "Error Interno",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error);
-                    return;
-                }
+                    Id = EditingReservaId,
+                    CabinaId = SelectedCabinaId,
+                    UsuarioId = _usuarioSeleccionado.Id,
+                    Inicio = dtpInicio.Value,
+                    Fin = dtpFin.Value
+                };
 
-                // 4.4) Crear o actualizar la entidad Reserva
-                bool ok;
-                if (IsEditMode)
-                {
-                    // MODO EDICIÓN: incluimos el Id para que EF Core sepa qué registro modificar
-                    var reservaEditar = new Reserva
-                    {
-                        Id = EditingReservaId,
-                        CabinaId = SelectedCabinaId,
-                        UsuarioId = _usuarioSeleccionado.Id,
-                        Inicio = dtpInicio.Value,
-                        Fin = dtpFin.Value
-                    };
-                    ok = await _vm.UpdateReservaAsync(reservaEditar);
-                }
-                else
-                {
-                    // MODO CREACIÓN: NO asignamos Id → dejamos que SQL Server genere la identidad
-                    var reservaNueva = new Reserva
-                    {
-                        CabinaId = SelectedCabinaId,
-                        UsuarioId = _usuarioSeleccionado.Id,
-                        Inicio = dtpInicio.Value,
-                        Fin = dtpFin.Value
-                    };
-                    ok = await _vm.CreateReservaAsync(reservaNueva);
-                }
-
+                // 4.4) Llamar al ViewModel para actualizar la reserva
+                bool ok = await _vm.UpdateReservaAsync(reserva);
                 if (!ok)
                 {
                     MessageBox.Show("Ya existe otra reserva en ese rango de tiempo.",
@@ -151,12 +119,12 @@ namespace Reserva_de_Espacios_Biblioteca.Views
                     return;
                 }
 
-                // 4.5) Todo salió bien: devolvemos OK y cerramos
+                // 4.5) Si todo va bien, devolvemos OK
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             };
 
-            // 5) Botón “Cancelar”: simplemente cierra
+            // 5) Botón “Cancelar”: cierra el formulario
             btnCancelar.Click += (_, __) => this.Close();
         }
 
@@ -189,17 +157,15 @@ namespace Reserva_de_Espacios_Biblioteca.Views
                 return;
             }
 
-            // Si hay más de uno, mostramos un cuadro para que elija cuál
+            // Si hay más de uno, pedimos elegir cuál
             if (listaUsuarios.Count > 1)
             {
-                // Construimos un string con “Índice - Apellidos Nombre (DNI)” para cada opción
                 string opciones = "";
                 for (int i = 0; i < listaUsuarios.Count; i++)
                 {
                     var us = listaUsuarios[i];
                     opciones += $"{i + 1}. {us.Apellidos} {us.Nombre} ({us.Dni})\n";
                 }
-
                 opciones += "\nEscribe el número de la opción que corresponda en el cuadro de texto.";
 
                 string entrada = Microsoft.VisualBasic.Interaction.InputBox(
@@ -223,11 +189,11 @@ namespace Reserva_de_Espacios_Biblioteca.Views
             }
             else
             {
-                // Si solo hay uno, lo seleccionamos directamente
+                // Si sólo hay uno, lo seleccionamos automáticamente
                 _usuarioSeleccionado = listaUsuarios[0];
             }
 
-            // Finalmente, mostramos en txtDni su APELLIDO1 APELLIDO2, NOMBRE
+            // Finalmente, mostramos en txtDni “Apellidos, Nombre”
             txtDni.Text = $"{_usuarioSeleccionado.Apellidos}, {_usuarioSeleccionado.Nombre}";
             MessageBox.Show(
                 $"Usuario seleccionado:\n{_usuarioSeleccionado.Apellidos}, {_usuarioSeleccionado.Nombre} ({_usuarioSeleccionado.Dni})",
